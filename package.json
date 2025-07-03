@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +16,13 @@
     "mongoose": "^8.16.1",
     "mysql": "^2.18.1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DGDE5228/PulsenseBack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DGDE5228/PulsenseBack/issues"
+  },
+  "homepage": "https://github.com/DGDE5228/PulsenseBack#readme",
   "description": ""
 }
