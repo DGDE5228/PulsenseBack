@@ -10,16 +10,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
+// 🧩 Middlewares
 app.use(cors());
 app.use(bodyParser.json());
 
-// Log de todas las rutas recibidas (debug)
+// 🕵️ Log de rutas (debug)
 app.use((req, res, next) => {
   console.log(`🔍 Ruta recibida: ${req.method} ${req.url}`);
   next();
 });
 
-// Conexión a MongoDB
+// 🔌 Conexión a MongoDB
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -27,11 +28,39 @@ mongoose.connect(MONGODB_URI, {
 .then(() => console.log('✅ Conectado a MongoDB Atlas'))
 .catch(err => console.error('❌ Error conectando a MongoDB:', err));
 
-// Ruta de login
+// ✅ Ruta para registrar usuario
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    if (!username || !password) {
+      return res.status(400).json({ success: false, message: 'Faltan datos' });
+    }
+
+    const existingUser = await Usuario.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'El usuario ya existe' });
+    }
+
+    const newUser = new Usuario({ username, password });
+    await newUser.save();
+
+    res.status(201).json({ success: true, message: 'Usuario registrado exitosamente' });
+  } catch (err) {
+    console.error('❌ Error en /register:', err);
+    res.status(500).json({ success: false, message: 'Error del servidor al registrar' });
+  }
+});
+
+// ✅ Ruta de login
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    if (!username || !password) {
+      return res.status(400).json({ success: false, message: 'Faltan datos' });
+    }
+
     const user = await Usuario.findOne({ username, password });
     if (user) {
       res.json({ success: true, message: 'Login exitoso' });
@@ -44,16 +73,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Si tienes frontend embebido (como archivos Ionic en "www")
-//* const wwwPath = path.join(__dirname, 'www');
-//if (require('fs').existsSync(wwwPath)) {
- // app.use(express.static(wwwPath));
- // app.get('*', (req, res) => {
- //   res.sendFile(path.join(wwwPath, 'index.html'));
- // });
-//}
-
-// Arrancar servidor
+// ▶️ Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
