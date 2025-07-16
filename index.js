@@ -50,6 +50,7 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error del servidor al registrar' });
   }
 });
+
 // ✅ Ruta de login
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
@@ -66,16 +67,17 @@ app.post('/login', async (req, res) => {
       res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
     }
   } catch (err) {
-    console.error('❌ Error en login:', err);
+    console.error('❌ Error en /login:', err);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
+
 //  Esta línea sirve archivos estáticos (Angular/Ionic build)
 app.use(express.static(path.join(__dirname, 'www')));
 
 //  Esto sirve index.html en cualquier ruta no encontrada (SPA support)
-app.get('/{*splat}', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'www', 'index.html'));
 });
 // ▶️ Iniciar servidor
 app.listen(PORT, () => {
