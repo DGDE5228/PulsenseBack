@@ -75,7 +75,7 @@ app.use(express.static(path.join(__dirname, 'www')));
 
 //  Esto sirve index.html en cualquier ruta no encontrada (SPA support)
 app.get('/{*splat}', (req, res) => {
-  res.sendFile(path.join(__dirname, 'www', 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 // ▶️ Iniciar servidor
 app.listen(PORT, () => {
