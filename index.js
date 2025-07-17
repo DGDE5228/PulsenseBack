@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 });
 
 // 🔌 Conexión a MongoDB
-mongoose.connect(MONGODB_URI, {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -61,16 +61,20 @@ app.post('/login', async (req, res) => {
     }
 
     const user = await Usuario.findOne({ username, password });
-    if (user) {
-      res.json({ success: true, message: 'Login exitoso' });
-    } else {
-      res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
+
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
     }
+
+    // ✅ Siempre devolver objeto bien formado
+    return res.json({ success: true, message: 'Login exitoso' });
+
   } catch (err) {
     console.error('❌ Error en /login:', err);
-    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    return res.status(500).json({ success: false, message: 'Error del servidor al iniciar sesión' });
   }
 });
+
 
 //  Esta línea sirve archivos estáticos (Angular/Ionic build)
 app.use(express.static(path.join(__dirname, 'www')));
