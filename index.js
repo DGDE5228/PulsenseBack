@@ -51,7 +51,6 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// ✅ Ruta de login
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -60,20 +59,24 @@ app.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Faltan datos' });
     }
 
-    const user = await Usuario.findOne({ username, password });
+    const user = await Usuario.findOne({ username });
 
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
+      return res.status(401).json({ success: false, message: 'Usuario no encontrado' });
     }
 
-    // ✅ Siempre devolver objeto bien formado
-    return res.json({ success: true, message: 'Login exitoso' });
+    if (user.password !== password) {
+      return res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Login exitoso', user });
 
   } catch (err) {
     console.error('❌ Error en /login:', err);
     return res.status(500).json({ success: false, message: 'Error del servidor al iniciar sesión' });
   }
 });
+
 
 
 //  Esta línea sirve archivos estáticos (Angular/Ionic build)

@@ -5,4 +5,4 @@ const UserSchema = new mongoose.Schema({
   password: String
 }, { collection: 'users' }); // ← esto es importante si tu colección no es 'users'
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('Usuario', UserSchema);
