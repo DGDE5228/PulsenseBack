@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
   username: String,
   password: String
-}, { collection: 'users' }); // ← esto es importante si tu colección no es 'users'
+}, { collection: 'users' });
 
-module.exports = mongoose.model('user', UserSchema);
+module.exports = mongoose.model('User', UserSchema, 'users');
+
