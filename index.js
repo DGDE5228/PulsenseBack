@@ -10,6 +10,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
+app.use(cors({
+  origin: 'https://pulsense.onrender.com'
+}));
+
 // 🧩 Middlewares
 app.use(cors());
 app.use(bodyParser.json());
@@ -88,3 +92,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en https://pulsense.onrender.com`);
 });
+
