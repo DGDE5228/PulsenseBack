@@ -54,22 +54,21 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
+  console.log('📥 Petición recibida en /login'); // 👈 NUEVO
   const { username, password } = req.body;
+  console.log('🔑 Credenciales recibidas:', username, password); // 👈 NUEVO
 
   try {
     if (!username || !password) {
       return res.status(400).json({ success: false, message: 'Faltan datos' });
     }
-
     const user = await Usuario.findOne({ username });
     if (!user) {
       return res.status(401).json({ success: false, message: 'Usuario no encontrado' });
     }
-
     if (user.password !== password) {
       return res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
     }
-
     return res.status(200).json({ success: true, message: 'Login exitoso', user });
   } catch (err) {
     console.error('❌ Error en /login:', err);
