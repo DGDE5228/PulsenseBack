@@ -5,6 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const Usuario = require('./models/Usuario');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -20,14 +21,15 @@ app.use((req, res, next) => {
 });
 
 // 🔌 Conexión a MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 .then(() => console.log('✅ Conectado a MongoDB Atlas'))
 .catch(err => console.error('❌ Error conectando a MongoDB:', err));
 
-// ✅ Ruta para registrar usuario
+// ✅ RUTAS DE API (deben estar antes de servir archivos estáticos)
+
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
@@ -60,7 +62,6 @@ app.post('/login', async (req, res) => {
     }
 
     const user = await Usuario.findOne({ username });
-
     if (!user) {
       return res.status(401).json({ success: false, message: 'Usuario no encontrado' });
     }
@@ -70,22 +71,20 @@ app.post('/login', async (req, res) => {
     }
 
     return res.status(200).json({ success: true, message: 'Login exitoso', user });
-
   } catch (err) {
     console.error('❌ Error en /login:', err);
     return res.status(500).json({ success: false, message: 'Error del servidor al iniciar sesión' });
   }
 });
 
-
-
-//  Esta línea sirve archivos estáticos (Angular/Ionic build)
+// 🧱 Sirve los archivos estáticos de la app Angular/Ionic (después de las rutas API)
 app.use(express.static(path.join(__dirname, 'www')));
 
-//  Esto sirve index.html en cualquier ruta no encontrada (SPA support)
+// 🌐 SPA support: redirige rutas desconocidas al frontend
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'www', 'index.html'));
 });
+
 // ▶️ Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en https://pulsense.onrender.com`);
