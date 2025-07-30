@@ -14,7 +14,8 @@
     "dotenv": "^17.0.1",
     "express": "^4.21.2",
     "mongoose": "^8.16.1",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "ws": "^8.18.3"
   },
   "repository": {
     "type": "git",
