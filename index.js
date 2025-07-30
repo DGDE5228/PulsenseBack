@@ -10,39 +10,45 @@ const User = require('./models/Usuario');
 const app = express();
 const server = http.createServer(app);
 
+// 🔗 Configuración
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// Conexión a MongoDB
+// 📡 CORS: permite peticiones desde web y móvil
+const corsOptions = {
+  origin: [
+    'https://pulsense.onrender.com', // Web producción
+    'capacitor://localhost',         // App móvil
+    'http://localhost:8100'          // Ionic local
+  ],
+  methods: ['GET', 'POST'],
+  credentials: false
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // 👈 Esta línea es clave para permitir preflight
+
+// 🔌 Middleware
+app.use(bodyParser.json());
+
+// 🌱 Conexión a MongoDB
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => console.log('✅ Conectado a MongoDB'))
   .catch(err => console.error('❌ Error al conectar a MongoDB:', err));
 
-// CORS (compatible con web y app móvil)
-app.use(cors({
-  origin: [
-    'https://pulsense.onrender.com', // Web en producción
-    'capacitor://localhost',         // App móvil en Android/iOS
-    'http://localhost:8100'          // Ionic local (dev)
-  ],
-  methods: ['GET', 'POST'],
-  credentials: false // No se usan cookies/sesiones en este backend
-}));
-
-// Body Parser
-app.use(bodyParser.json());
-
-// Registro
+// 📥 Registro de usuario
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
+
   if (!username || !password) {
     return res.status(400).json({ success: false, message: 'Campos requeridos' });
   }
 
   try {
     const existingUser = await User.findOne({ username });
+
     if (existingUser) {
       return res.status(409).json({ success: false, message: 'Usuario ya existe' });
     }
@@ -57,9 +63,10 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Login
+// 🔐 Login
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
+
   if (!username || !password) {
     return res.status(400).json({ success: false, message: 'Campos requeridos' });
   }
@@ -78,13 +85,13 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Servir frontend (solo si subes Ionic a este backend, opcional)
+// 🧭 Servir frontend (opcional si subes Ionic aquí)
 app.use(express.static(path.join(__dirname, 'www')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'www', 'index.html'));
 });
 
-// Iniciar servidor
+// 🚀 Iniciar servidor
 server.listen(PORT, () => {
-  console.log(`🚀 Backend disponible en https://pulsenseback.onrender.com`);
+  console.log(`🟢 Backend corriendo en https://pulsenseback.onrender.com`);
 });
