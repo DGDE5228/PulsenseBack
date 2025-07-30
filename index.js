@@ -5,12 +5,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const http = require('http');
-const WebSocket = require('ws');
 const User = require('./models/Usuario');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
 
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -22,23 +20,15 @@ mongoose.connect(MONGODB_URI, {
 }).then(() => console.log('✅ Conectado a MongoDB'))
   .catch(err => console.error('❌ Error al conectar a MongoDB:', err));
 
-// WebSocket
-wss.on('connection', (ws) => {
-  console.log('🔌 Cliente WebSocket conectado');
-
-  ws.on('message', (msg) => {
-    console.log('📩 Mensaje recibido:', msg);
-    ws.send('📤 Eco desde servidor: ' + msg);
-  });
-
-  ws.on('close', () => {
-    console.log('❎ Cliente WebSocket desconectado');
-  });
-});
-
-// CORS
+// CORS (compatible con web y app móvil)
 app.use(cors({
-  origin: 'https://pulsense.onrender.com'
+  origin: [
+    'https://pulsense.onrender.com', // Web en producción
+    'capacitor://localhost',         // App móvil en Android/iOS
+    'http://localhost:8100'          // Ionic local (dev)
+  ],
+  methods: ['GET', 'POST'],
+  credentials: false // No se usan cookies/sesiones en este backend
 }));
 
 // Body Parser
@@ -67,7 +57,6 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
 // Login
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
@@ -89,11 +78,8 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
-// Servir frontend (si aplica)
+// Servir frontend (solo si subes Ionic a este backend, opcional)
 app.use(express.static(path.join(__dirname, 'www')));
-
-// SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'www', 'index.html'));
 });
