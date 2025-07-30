@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const http = require('http');
 const WebSocket = require('ws');
-const User = require('./models/usuario');
+const User = require('./models/Usuario');
 
 const app = express();
 const server = http.createServer(app);
